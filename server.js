@@ -323,10 +323,7 @@ io.on('connection', (socket) => {
 
   //
   app.post('/get_groups', async (req, res) => {
-    // const {roomname } = req.body;
-    // if (!username) {
-    //   return res.status(400).json({ error: 'Invalid username' });
-    // }
+  
     try {
       const groupList = await groups.distinct('roomname', {
         // $or: [{ sender: username }],
