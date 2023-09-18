@@ -206,7 +206,7 @@ function temp() {
       });
    
 
-      
+
       // socket.emit('group_message', { groupName: targetGroup,sender:username, message: groupMessage });
 socket.on('room_message', ({ sender, roommessage }) => {
             console.log("receiving message");
@@ -220,11 +220,10 @@ else {
   groupmsgList.innerHTML += `<li class="mychat">${roommessage}<strong>:you</strong> </li>`;
   console.log("other");
 }
-groupmsgList.scrollTop = groupmsgList.scrollHeight;
+roomBox.scrollTop = roomBox.scrollHeight;
 });
 
 
   </script>
 </body>
-
 </html>
