@@ -95,15 +95,11 @@ function temp() {
       groupLinks.forEach((link) => {
         link.addEventListener('click', async () => {
           //  username = prompt("Enter your name here!")
-          const sender = username
+          const sender = username  
           if (username) {
             const targetroom = link.innerText;
             socket.emit('join_room', targetroom, sender);
-
-            // groupLinks.forEach((otherLink) => {
-            //   otherLink.classList.remove('clicked');
-            // });
-
+            console.log(targetroom,"targetroom",sender,"sender");
 
             roomBox.innerHTML = `<h2 style=" border-bottom: 3px solid #000000; background-color: rgb(42, 41, 41); color: white; padding-top: 10px; padding-bottom: 7px">
                         ${targetroom} Group</h2>
@@ -135,7 +131,8 @@ function temp() {
                     // Display messages sent by the current user
                     messageItem.className = "mychat"
                     messageItem.innerHTML = `${message.roommessage}<strong>:You</strong>`;
-                  } else {
+                  }
+                  else {
                     // Display messages sent by other users in the group
                     messageItem.className = "yourchat"
                     messageItem.innerHTML = `<strong>${message.sender}:</strong> ${message.roommessage}`;
@@ -150,34 +147,24 @@ function temp() {
             } catch (error) {
               console.error('Error fetching chat history:', error);
             }
-
             groupsendButton.addEventListener('click', () => {
+              console.log("sended");
               const roommessage = groupmsgInput.value;
               if (roommessage.trim() !== '') {
                 socket.emit('Send_message', { targetroom: targetroom, sender: username, roommessage: roommessage });
+                console.log(targetroom,sender,roommessage);
+                console.log("log_messages");
                 // socket.emit('room_message', { targetroom, roommessage });
                 // groupmsgList.innerHTML += `<li class="mychat"><strong>You:</strong> ${roommessage}</li>`;     
                 groupmsgInput.value = '';
                 groupmsgList.scrollTop = groupmsgList.scrollHeight;
-              }
+              }      
             });
           }
         });
-      });
-      socket.on('room_message', ({ sender, roommessage }) => {
+      });      
+}
 
-const groupmsgList = document.getElementById('group_msg_list');
-
-if (sender != username) {
-  groupmsgList.innerHTML += `<li class="yourchat"><strong> ${sender}:</strong> ${roommessage}</li>`;
-}
-else {
-  groupmsgList.innerHTML += `<li class="mychat">${roommessage}<strong>:you</strong> </li>`;
-  console.log("other");
-}
-groupmsgList.scrollTop = groupmsgList.scrollHeight;
-});
-}
     socket.on('room_list', async (rooms) => {
       try {
         const response = await fetch('/get_groups', {
@@ -197,6 +184,7 @@ groupmsgList.scrollTop = groupmsgList.scrollHeight;
             receiverItem.innerHTML = `<button class="group_link">${receiver}</button>`
             roomlist.appendChild(receiverItem);
           });
+          console.log("appended");
         } else {
           console.error('Failed to fetch receivers list');
         }
@@ -204,188 +192,36 @@ groupmsgList.scrollTop = groupmsgList.scrollHeight;
         console.error('Error fetching receivers list:', error);
       }
 
+ 
       temp()
+    });
 
-      // const groupLinks = document.querySelectorAll('.group_link');
-      // groupLinks.forEach((link) => {
-      //   link.addEventListener('click', async () => {
-      //     //  username = prompt("Enter your name here!")
-      //     const sender = username
-      //     if (username) {
-      //       const targetroom = link.innerText;
-      //       socket.emit('join_room', targetroom, sender);
-
-      //       // groupLinks.forEach((otherLink) => {
-      //       //   otherLink.classList.remove('clicked');
-      //       // });
-
-
-      //       roomBox.innerHTML = `<h2 style=" border-bottom: 3px solid #000000; background-color: rgb(42, 41, 41); color: white; padding-top: 10px; padding-bottom: 7px">
-      //                   ${targetroom} Group</h2>
-      //                   <ul id="group_msg_list"></ul>
-      //                   <div class="typearea">  
-      //                       <input type="text" id="group_msg_input" placeholder="Type a message">
-      //                       <button id="group_send_button">Send</button> 
-      //                   </div>`;
-      //       link.classList.add('clicked');
-      //       const groupmsgList = document.getElementById('group_msg_list');
-      //       const groupmsgInput = document.getElementById('group_msg_input');
-      //       const groupsendButton = document.getElementById('group_send_button');
-      //       //chat_history
-      //       try {
-      //         const server_response = await fetch('/Group_chat_history', {
-      //           method: 'POST',
-      //           headers: { 'Content-Type': 'application/json' },
-      //           body: JSON.stringify({ sender: username, targetroom: targetroom }),
-      //         });
-
-      //         if (server_response.ok) {
-      //           const messageData = await server_response.json();
-      //           messageData.forEach((message) => {
-      //             const messageItem = document.createElement('li');
-      //             // const messageClass = message.sender === username ? 'mychat' : 'yourchat';
-      //             // messageItem.className = messageClass;
-      //             // messageItem.textContent = `${message.sender}: ${message.roommessage}`;
-      //             if (message.sender === username) {
-      //               // Display messages sent by the current user
-      //               messageItem.className = "mychat"
-      //               messageItem.innerHTML = `${message.roommessage}<strong>:You</strong>`;
-      //             } else {
-      //               // Display messages sent by other users in the group
-      //               messageItem.className = "yourchat"
-      //               messageItem.innerHTML = `<strong>${message.sender}:</strong> ${message.roommessage}`;
-      //             }
-      //             groupmsgList.appendChild(messageItem);
-      //           });
-      //           // Scroll to the bottom of the groupmsgList
-      //           groupmsgList.scrollTop = groupmsgList.scrollHeight;
-      //         } else {
-      //           console.error('Failed to fetch chat history');
-      //         }
-      //       } catch (error) {
-      //         console.error('Error fetching chat history:', error);
-      //       }
-
-      //       groupsendButton.addEventListener('click', () => {
-      //         const roommessage = groupmsgInput.value;
-      //         if (roommessage.trim() !== '') {
-      //           socket.emit('Send_message', { targetroom: targetroom, sender: username, roommessage: roommessage });
-      //           // socket.emit('room_message', { targetroom, roommessage });
-      //           // groupmsgList.innerHTML += `<li class="mychat"><strong>You:</strong> ${roommessage}</li>`;     
-      //           groupmsgInput.value = '';
-      //           groupmsgList.scrollTop = groupmsgList.scrollHeight;
-      //         }
-      //       });
-      //     }
-      //   });
-      // });
-      //
       socket.on('creating_group', async (rooms) => {
         const list = document.createElement('li');
         list.innerHTML = `<button class="group_link">${rooms}</button>`
         roomlist.appendChild(list)
         console.log("worked");
-        //tampaaaaa()
-
-        const groupLinks = document.querySelectorAll('.group_link');
-        groupLinks.forEach((link) => {
-          link.addEventListener('click', async () => {
-            //  username = prompt("Enter your name here!")
-            const sender = username
-            if (username) {
-              const targetroom = link.innerText;
-              socket.emit('join_room', targetroom, sender);
-
-              // groupLinks.forEach((otherLink) => {
-              //   otherLink.classList.remove('clicked');
-              // });
-
-
-              roomBox.innerHTML = `<h2 style=" border-bottom: 3px solid #000000; background-color: rgb(42, 41, 41); color: white; padding-top: 10px; padding-bottom: 7px">
-                        ${targetroom} Group</h2>
-                        <ul id="group_msg_list"></ul>
-                        <div class="typearea">  
-                            <input type="text" id="group_msg_input" placeholder="Type a message">
-                            <button id="group_send_button">Send</button> 
-                        </div>`;
-              link.classList.add('clicked');
-              const groupmsgList = document.getElementById('group_msg_list');
-              const groupmsgInput = document.getElementById('group_msg_input');
-              const groupsendButton = document.getElementById('group_send_button');
-              //chat_history
-              try {
-                const server_response = await fetch('/Group_chat_history', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ sender: username, targetroom: targetroom }),
-                });
-
-                if (server_response.ok) {
-                  const messageData = await server_response.json();
-                  messageData.forEach((message) => {
-                    const messageItem = document.createElement('li');
-                    // const messageClass = message.sender === username ? 'mychat' : 'yourchat';
-                    // messageItem.className = messageClass;
-                    // messageItem.textContent = `${message.sender}: ${message.roommessage}`;
-                    if (message.sender === username) {
-                      // Display messages sent by the current user
-                      messageItem.className = "mychat"
-                      messageItem.innerHTML = `${message.roommessage}<strong>:You</strong>`;
-                    } else {
-                      // Display messages sent by other users in the group
-                      messageItem.className = "yourchat"
-                      messageItem.innerHTML = `<strong>${message.sender}:</strong> ${message.roommessage}`;
-                    }
-                    groupmsgList.appendChild(messageItem);
-                  });
-                  // Scroll to the bottom of the groupmsgList
-                  groupmsgList.scrollTop = groupmsgList.scrollHeight;
-                } else {
-                  console.error('Failed to fetch chat history');
-                }
-              } catch (error) {
-                console.error('Error fetching chat history:', error);
-              }
-
-
-              // const storedUsername = localStorage.getItem('username');
-              // if (storedUsername) {
-              //     const usernameDisplay = document.getElementById('username-display');
-              //     usernameDisplay.textContent = `Logged in as: ${storedUsername}`;
-              // }
-
-              groupsendButton.addEventListener('click', () => {
-                const roommessage = groupmsgInput.value;
-                if (roommessage.trim() !== '') {
-                  socket.emit('Send_message', { targetroom: targetroom, sender: username, roommessage: roommessage });
-                  // socket.emit('room_message', { targetroom, roommessage });
-                  // groupmsgList.innerHTML += `<li class="mychat"><strong>You:</strong> ${roommessage}</li>`;     
-                  groupmsgInput.value = '';
-                  groupmsgList.scrollTop = groupmsgList.scrollHeight;
-                }
-              });
-            }
-          });
-        });
-
+        temp()
 
       });
-    });
-    // socket.emit('group_message', { groupName: targetGroup,sender:username, message: groupMessage });
+   
 
-    // socket.on('room_message', ({ sender, roommessage }) => {
+      
+      // socket.emit('group_message', { groupName: targetGroup,sender:username, message: groupMessage });
+socket.on('room_message', ({ sender, roommessage }) => {
+            console.log("receiving message");
+            console.log(sender,roommessage);
+const groupmsgList = document.getElementById('group_msg_list');
 
-    //   const groupmsgList = document.getElementById('group_msg_list');
-
-    //   if (sender != username) {
-    //     groupmsgList.innerHTML += `<li class="yourchat"><strong> ${sender}:</strong> ${roommessage}</li>`;
-    //   }
-    //   else {
-    //     groupmsgList.innerHTML += `<li class="mychat">${roommessage}<strong>:you</strong> </li>`;
-    //     console.log("other");
-    //   }
-    //   groupmsgList.scrollTop = groupmsgList.scrollHeight;
-    // });
+if (sender != username) {
+  groupmsgList.innerHTML += `<li class="yourchat"><strong> ${sender}:</strong> ${roommessage}</li>`;
+}
+else {
+  groupmsgList.innerHTML += `<li class="mychat">${roommessage}<strong>:you</strong> </li>`;
+  console.log("other");
+}
+groupmsgList.scrollTop = groupmsgList.scrollHeight;
+});
 
 
   </script>

@@ -236,24 +236,25 @@ io.on('connection', (socket) => {
     availableRooms[roomname] = [socket.id];
     const groupname = new groups({ roomname, admin });
     await groupname.save();
-    console.log(availableRooms[roomname] = [socket.id]);
+    // console.log(availableRooms[roomname] = [socket.id]);
     io.emit('creating_group', roomname);
   });
   socket.emit('room_list', Object.keys(availableRooms));
 
   //join group
   socket.on('join_room', (roomname, sender) => {
-    if (availableRooms[roomname]) {
-      availableRooms[roomname].push(socket.id);
+    // if (availableRooms[roomname]) {
+    //   availableRooms[roomname].push(socket.id);
       socket.join(roomname); // Join the room
+      console.log(`${sender} joined ${roomname}`);
 
       if (!connectedUsersInRooms[roomname]) {
         connectedUsersInRooms[roomname] = [];
+        // console.log("no users");
       }
-
       connectedUsersInRooms[roomname].push(sender);
       io.to(roomname).emit('room_users', connectedUsersInRooms[roomname]);
-    }
+    // }
   });
 
   //message send and receive
@@ -261,11 +262,14 @@ io.on('connection', (socket) => {
     // console.log(targetroom,":targetroom");
     // console.log(sender,':sender');
     // console.log(roommessage,":roommessage");
-
+  
     const groupMessage = new GroupMsg({ targetroom, sender, roommessage });
     await groupMessage.save();
+
     // const sender = activeUsers[socket.id];
-    io.to(targetroom).emit('room_message', { sender, roommessage });
+    // console.log("working from server");
+    // io.emit("qwert",{sender,roommessage})
+    io.to(targetroom).emit('room_message',{ sender, roommessage })
   });
 
 
@@ -328,7 +332,7 @@ io.on('connection', (socket) => {
       const groupList = await groups.distinct('roomname', {
         // $or: [{ sender: username }],
       });
-      console.log(groupList, "//////////////////////////////")
+      console.log( "Aviilable Rooms",groupList)
       res.json(groupList);
     } catch (error) {
       console.error('Error fetching group list:', error);
