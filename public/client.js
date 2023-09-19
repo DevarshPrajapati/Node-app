@@ -1,4 +1,5 @@
-  (async function () {
+  // (async function () {
+    document.addEventListener('DOMContentLoaded', function() {
   const app = document.querySelector(".app");
   // const joinScreen = document.querySelector(".join-screen");
   const userList = document.getElementById('user-list');
@@ -96,13 +97,15 @@
           otherLink.classList.remove('clicked');
         });
 
+        // <img id="receivedImage" style="max-width: 300px;">
         chatBox.innerHTML = `<div><h2 id='users_name'>
         ${targetUser}'s Chat </h2> <h3 id="type"></h3></div>
-        <ul id="message-list"></ul>
+        <ul id="message-list">
+        </ul>
         <div class="typearea">  
           <input type="text" id="message-input" placeholder="Type a message">
-          <input type="file" id="upload_img" ">
-          <button id="send-button">Send</button> 
+          <input type="file" id="img" >
+          <button id="send_button">Send</button> 
         </div>`;
         // <label for="upload">
         // <input type="file" id="upload_img"/>
@@ -112,7 +115,7 @@
         link.classList.add('clicked');
         const messageList = document.getElementById('message-list');
         const messageInput = document.getElementById('message-input');
-        const sendButton = document.getElementById('send-button');
+        const sendButton = document.getElementById('send_button');
         const  typing = document.getElementById("type")
 
         try {
@@ -138,7 +141,7 @@
               messageList.appendChild(messageItem);
             });
             // Scroll to the bottom of the messageList
-            messageList.scrollTop = messageList.scrollHeight;
+            chatBox.scrollTop = chatBox.scrollHeight;
           } else {
             console.error('Failed to fetch chat history');
           }
@@ -151,8 +154,13 @@
         // messageList.innerHTML += `<li class="mychat"><b>${targetUser} is typing</b> </li>`;
         // })
 
-            // const messageInput = document.getElementById('messageInput');
+            // const messageInput = document.getElementById('messageInput'o.emit('image');
 //
+  // Your JavaScript code here
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var src 
+
+const imgtag = document.getElementById("img")
         sendButton.addEventListener('click', () => {
           const message = messageInput.value;
          
@@ -160,10 +168,34 @@
             socket.emit('private_message', { targetUser, message });
             messageList.innerHTML += `<li class="mychat"><b>${message}:You</b> </li>`;
             messageInput.value = '';
-            messageList.scrollTop = messageList.scrollHeight;
+            chatBox.scrollTop = chatBox.scrollHeight;                           
           }
-        });
 
+var file = imgtag.files[0];
+  if (file) {
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const dataURL = event.target.result;
+       console.log(dataURL,"Url WOrked");
+       src = dataURL
+       socket.emit('image', {dataURL,targetUser});
+    };
+    reader.readAsDataURL(file);
+}
+});
+//////////////////////////////////
+
+
+    socket.on('image', (dataURL) => {
+      var li = document.createElement('li')
+      var img = document.createElement('img')
+      img.src = dataURL;
+   li.appendChild(img)
+   messageList.appendChild(li)
+  
+});
+////////////////////////////
         socket.on('private_message', ({ sender, message }) => {
           if (sender === targetUser) {
             messageList.innerHTML += `<li class="yourchat"><strong>${sender}:</strong> ${message}</li>`;
@@ -182,7 +214,7 @@
     //     console.log("not typing");
     //   }
     // });
-            messageList.scrollTop = messageList.scrollHeight;                        
+    chatBox.scrollTop = chatBox.scrollHeight;                        
           }
         });
 
@@ -205,4 +237,6 @@ socket.on('user_stopped_typing', () => {
       });
     });
   });
-})();
+
+});
+// })();

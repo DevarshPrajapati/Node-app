@@ -162,7 +162,7 @@ margin-top: 100px;
 /* } */
 
 /* Style the send button */
-#send-button {
+#send_button {
   background-color: #007bff;
   color: #fff;
   border: none;
@@ -174,7 +174,7 @@ margin-top: 100px;
   width: 6%;
 }
 
-#send-button:hover {
+#send_button:hover {
   background-color: #0056b3;
 }
 .active_user{
