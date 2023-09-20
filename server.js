@@ -161,17 +161,20 @@ io.on('connection', (socket) => {
     // socket.emit('username', username);
   });
 
-  //image_send
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////Image-Share///////////////////////////////////////////////////////////////////
 
 socket.on('send_image', ({dataURL,targetUser}) => {
+  const sender = activeUsers[socket.id];
+  const receiver = targetUser;
+  // console.log(sender,receiver,dataURL);
+
   const fileName = `image-${Date.now()}.png`;
   const filePath = __dirname + '/public/images/' + fileName;
   const data = dataURL.replace(/^data:image\/png;base64,/, '');
   const targetSocketId = Object.keys(activeUsers).find(
     (socketId) => activeUsers[socketId] === targetUser
   );
-               
+
   fs.writeFile(filePath, data, 'base64', (err) => {
     if (err) {
       console.error(err);
@@ -185,8 +188,7 @@ socket.on('send_image', ({dataURL,targetUser}) => {
   });
 });
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //one-one communication
+                                                                //one-one communication//
   socket.on('send_message', async ({ targetUser, message }) => {
     const sender = activeUsers[socket.id];
     const receiver = targetUser;
@@ -214,7 +216,6 @@ socket.on('send_image', ({dataURL,targetUser}) => {
     );
 
     if (targetSocketId) {
-      // console.log("working");
       socket.to(targetSocketId).emit('user_typing', activeUsers[socket.id]);
     }
   });
@@ -250,8 +251,7 @@ socket.on('send_image', ({dataURL,targetUser}) => {
     }
   });
 
-  //group communication
-
+                                                                  //group communication//
   //create group
   socket.on('Create_room', async (roomname, admin) => {
     availableRooms[roomname] = [socket.id];
@@ -271,14 +271,12 @@ socket.on('send_image', ({dataURL,targetUser}) => {
 
       if (!connectedUsersInRooms[roomname]) {
         connectedUsersInRooms[roomname] = [];
-        // console.log("no users");
       }
       connectedUsersInRooms[roomname].push(sender);
       io.to(roomname).emit('room_users', connectedUsersInRooms[roomname]);
     // }
   });
 
-  //message send and receive
   socket.on('Send_message', async ({ targetroom, sender, roommessage }) => {
     // console.log(targetroom,":targetroom");
     // console.log(sender,':sender');
@@ -286,17 +284,8 @@ socket.on('send_image', ({dataURL,targetUser}) => {
   
     const groupMessage = new GroupMsg({ targetroom, sender, roommessage });
     await groupMessage.save();
-
-    // const sender = activeUsers[socket.id];
-    // console.log("working from server");
-    // io.emit("qwert",{sender,roommessage})
     io.to(targetroom).emit('room_message',{ sender, roommessage })
   });
-
-
-
-  // io.emit('user_list', Object.values(activeUsers));
-  // io.emit('room_list', Object.keys(availableRooms));
 
 
   // Group_chat History

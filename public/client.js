@@ -123,14 +123,12 @@ var src
 const imgtag = document.getElementById("img")
         sendButton.addEventListener('click', () => {
           const message = messageInput.value;
-         
           if (message.trim() !== '') {
             socket.emit('send_message', { targetUser, message });
             messageList.innerHTML += `<li class="mychat"><b>${message}:You</b> </li>`;
             messageInput.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;                           
           }
-
 const file = imgtag.files[0];
   if (file) {
     const reader = new FileReader();
@@ -159,7 +157,6 @@ const file = imgtag.files[0];
 });
 
     socket.on('receive_image', (dataURL) => {
-      console.log("else");
       console.log(dataURL);
       var recived_li = document.createElement('li')
         recived_li.classList.add("received_li_img")
