@@ -398,3 +398,12 @@ overflow-y: auto;
         margin-bottom: 600px;
         border: solid black;
 }
+
+.sended_li_img{
+  float: right;
+  list-style-type: none;
+}
+
+.received_li_img{
+  float: left;
+}

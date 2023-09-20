@@ -5,7 +5,9 @@ const messageSchema = new mongoose.Schema({
     receiver: { type: String,
             required: true },
     message: { type: String, 
-            required: true },
+            default: null },
+    image: { type:String,
+             default: null },
     timestamp: { type: Date,
              default: Date.now }        
 })

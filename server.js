@@ -164,23 +164,20 @@ io.on('connection', (socket) => {
   //image_send
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 socket.on('image', ({dataURL,targetUser}) => {
-
   const fileName = `image-${Date.now()}.png`;
   const filePath = __dirname + '/public/images/' + fileName;
-
-  const base64Data = dataURL.replace(/^data:image\/png;base64,/, '');
-
+  const data = dataURL.replace(/^data:image\/png;base64,/, '');
   const targetSocketId = Object.keys(activeUsers).find(
     (socketId) => activeUsers[socketId] === targetUser
   );
-
-  fs.writeFile(filePath, base64Data, 'base64', (err) => {
+  
+  fs.writeFile(filePath, data, 'base64', (err) => {
     if (err) {
       console.error(err);
     } else {
       console.log('Image saved:', fileName);
       if (targetSocketId) {
-        socket.emit('image', '/images/' + fileName);
+        // socket.emit('image', '/images/' + fileName);
         socket.to(targetSocketId).emit('image', '/images/' + fileName);
       }
     }
@@ -188,26 +185,22 @@ socket.on('image', ({dataURL,targetUser}) => {
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
   //one-one communication
-  socket.on('private_message', async ({ targetUser, message }) => {
+  socket.on('send_message', async ({ targetUser, message }) => {
     const sender = activeUsers[socket.id];
     const receiver = targetUser;
     // console.log(sender);
     // console.log(receiver);
     // console.log(message);
-
     const newMessage = new messages({ sender, receiver, message });
     await newMessage.save();
-
     const targetSocketId = Object.keys(activeUsers).find(
       (socketId) => activeUsers[socketId] === targetUser
     );
-
     //     console.log(socket.id,"sender");
     // console.log(targetSocketId,"receiversid");
     if (targetSocketId) {
-      socket.to(targetSocketId).emit('private_message',{
+      socket.to(targetSocketId).emit('receive_message',{
         sender,
         message,
       });

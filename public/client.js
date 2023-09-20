@@ -1,34 +1,11 @@
-  // (async function () {
+// (async function () {
     document.addEventListener('DOMContentLoaded', function() {
   const app = document.querySelector(".app");
-  // const joinScreen = document.querySelector(".join-screen");
   const userList = document.getElementById('user-list');
   const chatBox = document.getElementById('chat-box');
-  // const usernameInput = document.getElementById('username');
-  // const joinButton = document.getElementById('join-user');
-  // const roombutton = document.getElementById('roombutton');
 
   const socket = io();
 
-  // joinButton.addEventListener('click', () => {
-  //   const username = usernameInput.value.trim();
-  //   if (username !== '') {
-  //     socket.emit('user_connected', username);
-  //     joinScreen.style.display = 'none';
-  //   }
-  // });
-
-
-  // const usernameInput = document.getElementById('username');
-  // roombutton.addEventListener('click', () => {
-  //   const enteredUsername = usernameInput.value.trim();
-  //   if (enteredUsername !== '') {
-  //     socket.emit('user_connected', enteredUsername);
-  //     localStorage.setItem('username', enteredUsername);
-  //     // Redirect to the second page
-  //     window.location.href = 'GroupChat.html';
-  //   }
-  // });
   const welcomeMessage = document.getElementById('welcome-message');
   // console.log(welcomeMessage);
   const user_name = welcomeMessage.innerText;
@@ -86,12 +63,9 @@
     console.error('Error fetching receivers list:', error);
   }
 
-//
-
     const userLinks = document.querySelectorAll('.user-link');
     userLinks.forEach((link) => {
       link.addEventListener('click', async () => {
-        // console.log("hello");
         const targetUser = link.innerText;
         userLinks.forEach((otherLink) => {
           otherLink.classList.remove('clicked');
@@ -104,19 +78,14 @@
         </ul>
         <div class="typearea">  
           <input type="text" id="message-input" placeholder="Type a message">
-          <input type="file" id="img" >
+          <input type="file" id="img" name="image">
           <button id="send_button">Send</button> 
         </div>`;
-        // <label for="upload">
-        // <input type="file" id="upload_img"/>
-        // <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
-        // </label>
-      
+
         link.classList.add('clicked');
         const messageList = document.getElementById('message-list');
         const messageInput = document.getElementById('message-input');
         const sendButton = document.getElementById('send_button');
-        const  typing = document.getElementById("type")
 
         try {
           const server_response = await fetch('/chat_history', {
@@ -140,7 +109,6 @@
               }
               messageList.appendChild(messageItem);
             });
-            // Scroll to the bottom of the messageList
             chatBox.scrollTop = chatBox.scrollHeight;
           } else {
             console.error('Failed to fetch chat history');
@@ -148,89 +116,88 @@
         } catch (error) {
           console.error('Error fetching chat history:', error);
         }
-//
-        // messageInput.keyup(function (e) {
-        //   socket.emit('is typing',  {targetUser});
-        // messageList.innerHTML += `<li class="mychat"><b>${targetUser} is typing</b> </li>`;
-        // })
 
-            // const messageInput = document.getElementById('messageInput'o.emit('image');
-//
-  // Your JavaScript code here
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Image Share
 var src 
-
 const imgtag = document.getElementById("img")
         sendButton.addEventListener('click', () => {
           const message = messageInput.value;
          
           if (message.trim() !== '') {
-            socket.emit('private_message', { targetUser, message });
+            socket.emit('send_message', { targetUser, message });
             messageList.innerHTML += `<li class="mychat"><b>${message}:You</b> </li>`;
             messageInput.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;                           
           }
 
-var file = imgtag.files[0];
+const file = imgtag.files[0];
   if (file) {
-
     const reader = new FileReader();
+
+    var sended_li = document.createElement('li')
+    sended_li.classList.add("sended_li_img")
+    var sended_img = document.createElement('img')
     reader.onload = (event) => {
         const dataURL = event.target.result;
-       console.log(dataURL,"Url WOrked");
+      //  console.log(dataURL);
        src = dataURL
        socket.emit('image', {dataURL,targetUser});
+      sended_img.style.width = '300px'; 
+      sended_img.style.height = '200px';
+      sended_img.src = dataURL;
+      sended_li.appendChild(sended_img)
+      messageList.appendChild(sended_li)
+      chatBox.scrollTop = chatBox.scrollHeight; 
     };
+  
+    // console.log(reader);
+
     reader.readAsDataURL(file);
+    chatBox.scrollTop = chatBox.scrollHeight; 
 }
 });
-//////////////////////////////////
-
 
     socket.on('image', (dataURL) => {
-      var li = document.createElement('li')
-      var img = document.createElement('img')
-      img.src = dataURL;
-   li.appendChild(img)
-   messageList.appendChild(li)
-  
+      console.log("else");
+      console.log(dataURL);
+      var recived_li = document.createElement('li')
+        recived_li.classList.add("received_li_img")
+      var received_img = document.createElement('img')
+      received_img.style.width = '300px'; 
+      received_img.style.height = '200px';
+      received_img.src = dataURL;
+      recived_li.appendChild(received_img)
+      messageList.appendChild(recived_li)
+      chatBox.scrollTop = chatBox.scrollHeight; 
 });
-////////////////////////////
-        socket.on('private_message', ({ sender, message }) => {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        socket.on('receive_message', ({ sender, message }) => {
           if (sender === targetUser) {
             messageList.innerHTML += `<li class="yourchat"><strong>${sender}:</strong> ${message}</li>`;
 
-    //         messageInput.addEventListener('keypress', function(){
-    //           socket.emit('typing',sender);
-    //       });
-          
-    // socket.on('typing', function(sender){
-    //   if (sender) {
-    //     messageList.innerHTML = '<p><em>' + sender + ' is typing...</em></p>';
-    //     console.log('<p><em>' + sender + ' is typing...</em></p>');
-    //     console.log("typing");
-    //   } else {
-    //     messageList.innerHTML = ''
-    //     console.log("not typing");
-    //   }
-    // });
     chatBox.scrollTop = chatBox.scrollHeight;                        
           }
         });
-
-        const typingStatus = document.getElementById('typingStatus');
+        
+const typingStatus = document.getElementById('typingStatus');
 let typingTimeout;
 
-messageInput.addEventListener('keyup', () => {
+messageInput.addEventListener('keyup', (e) => {
   clearTimeout(typingTimeout);
   socket.emit('typing', targetUser);
   typingTimeout = setTimeout(() => {
     socket.emit('stopped_typing', targetUser);
   }, 3000); 
+  if (e.key ==="Enter") {
+    sendButton.click()
+  }
 });
+
 socket.on('user_typing', (sender) => {
   typingStatus.innerHTML = `${sender} is typing...`;
 });
+
 socket.on('user_stopped_typing', () => {
   typingStatus.innerHTML = '';
 });
