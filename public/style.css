@@ -400,10 +400,11 @@ overflow-y: auto;
 }
 
 .sended_li_img{
-  float: right;
+  /* float: right; */
+  margin-left: 73%;
   list-style-type: none;
 }
-
+/* 
 .received_li_img{
   float: left;
-}
+} */

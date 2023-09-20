@@ -118,7 +118,7 @@
         }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Image Share
+                                                    //Image Share
 var src 
 const imgtag = document.getElementById("img")
         sendButton.addEventListener('click', () => {
@@ -142,7 +142,7 @@ const file = imgtag.files[0];
         const dataURL = event.target.result;
       //  console.log(dataURL);
        src = dataURL
-       socket.emit('image', {dataURL,targetUser});
+       socket.emit('send_image', {dataURL,targetUser});
       sended_img.style.width = '300px'; 
       sended_img.style.height = '200px';
       sended_img.src = dataURL;
@@ -158,7 +158,7 @@ const file = imgtag.files[0];
 }
 });
 
-    socket.on('image', (dataURL) => {
+    socket.on('receive_image', (dataURL) => {
       console.log("else");
       console.log(dataURL);
       var recived_li = document.createElement('li')

@@ -163,14 +163,15 @@ io.on('connection', (socket) => {
 
   //image_send
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-socket.on('image', ({dataURL,targetUser}) => {
+
+socket.on('send_image', ({dataURL,targetUser}) => {
   const fileName = `image-${Date.now()}.png`;
   const filePath = __dirname + '/public/images/' + fileName;
   const data = dataURL.replace(/^data:image\/png;base64,/, '');
   const targetSocketId = Object.keys(activeUsers).find(
     (socketId) => activeUsers[socketId] === targetUser
   );
-  
+               
   fs.writeFile(filePath, data, 'base64', (err) => {
     if (err) {
       console.error(err);
@@ -178,7 +179,7 @@ socket.on('image', ({dataURL,targetUser}) => {
       console.log('Image saved:', fileName);
       if (targetSocketId) {
         // socket.emit('image', '/images/' + fileName);
-        socket.to(targetSocketId).emit('image', '/images/' + fileName);
+        socket.to(targetSocketId).emit('receive_image', '/images/' + fileName);
       }
     }
   });
