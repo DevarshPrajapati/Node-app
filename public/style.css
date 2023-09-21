@@ -152,7 +152,7 @@ margin-top: 100px;
   border: 1px solid #ccc;
   border-radius: 4px;
   resize: none;
-  width: 48%;
+  width: 60%;
 }
 
 /* #upload_img{ */
@@ -408,3 +408,29 @@ overflow-y: auto;
 .received_li_img{
   float: left;
 } */
+
+#camera_btn{
+  width:60px;
+  height: 40px;
+  background-color: #007bff; 
+  border: none; 
+  color: white; 
+  border-radius: 10px;
+}
+
+#camera_btn:hover {
+  background-color: #0056b3;
+}
+
+#s_btn{
+  width:70px;
+  height: 40px;
+  background-color: #007bff; 
+  border: none; 
+  color: white; 
+  border-radius: 10px;
+}
+
+#s_btn:hover {
+  background-color: #0056b3;
+}

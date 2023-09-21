@@ -164,17 +164,16 @@ io.on('connection', (socket) => {
 ///////////////////////////////////////////////////////////////////Image-Share///////////////////////////////////////////////////////////////////
 
 socket.on('send_image', ({dataURL,targetUser}) => {
+  console.log("image worked");
   const sender = activeUsers[socket.id];
   const receiver = targetUser;
   // console.log(sender,receiver,dataURL);
-
   const fileName = `image-${Date.now()}.png`;
   const filePath = __dirname + '/public/images/' + fileName;
   const data = dataURL.replace(/^data:image\/png;base64,/, '');
   const targetSocketId = Object.keys(activeUsers).find(
     (socketId) => activeUsers[socketId] === targetUser
   );
-
   fs.writeFile(filePath, data, 'base64', (err) => {
     if (err) {
       console.error(err);
@@ -188,6 +187,31 @@ socket.on('send_image', ({dataURL,targetUser}) => {
   });
 });
 
+
+socket.on('send_video', ({dataURL,targetUser}) => {
+  console.log("video from server worked");
+  const sender = activeUsers[socket.id];
+  const receiver = targetUser;
+  // console.log(sender,receiver,dataURL);
+  const fileName = `video-${Date.now()}.mp4`;
+  const filePath = __dirname + '/public/videos/' + fileName;
+  const data = dataURL.replace(/^data:image\/png;base64,/, '');
+  const targetSocketId = Object.keys(activeUsers).find(
+    (socketId) => activeUsers[socketId] === targetUser
+  );
+
+  fs.writeFile(filePath, data, 'base64', (err) => {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log('video saved:', fileName);
+      if (targetSocketId) {
+        console.log("id for video found");
+        socket.to(targetSocketId).emit('receive_video', '/videos/' + fileName);
+      }
+    }
+  });
+});
                                                                 //one-one communication//
   socket.on('send_message', async ({ targetUser, message }) => {
     const sender = activeUsers[socket.id];
@@ -251,7 +275,7 @@ socket.on('send_image', ({dataURL,targetUser}) => {
     }
   });
 
-                                                                  //group communication//
+                                                          //group communication//
   //create group
   socket.on('Create_room', async (roomname, admin) => {
     availableRooms[roomname] = [socket.id];
@@ -316,7 +340,6 @@ socket.on('send_image', ({dataURL,targetUser}) => {
   });
 
 
-
   app.post('/get_receivers', async (req, res) => {
     const { username } = req.body;
     if (!username) {
@@ -327,7 +350,6 @@ socket.on('send_image', ({dataURL,targetUser}) => {
       const receiversList = await User.distinct('username', {
         // $or: [{ sender: username }],
       });
-
       res.json(receiversList);
     } catch (error) {
       console.error('Error fetching receivers list:', error);
@@ -335,9 +357,7 @@ socket.on('send_image', ({dataURL,targetUser}) => {
     }
   });
 
-  //
   app.post('/get_groups', async (req, res) => {
-  
     try {
       const groupList = await groups.distinct('roomname', {
         // $or: [{ sender: username }],
@@ -349,7 +369,7 @@ socket.on('send_image', ({dataURL,targetUser}) => {
       res.status(500).json({ error: 'Error fetching group list' });
     }
   });
-  //
+
 });
 
 
