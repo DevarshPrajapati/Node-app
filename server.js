@@ -17,7 +17,7 @@ const connection = require("./config/connection")
 const GroupMsg = require("./model/groupmsg")
 const groups = require("./model/Groups")
 const User = require("./model/userSchema")
-// 
+
 const jwt = require("jsonwebtoken")
 const config = require("./config/secretkey")
 const bcrypt = require("bcrypt");
@@ -161,6 +161,32 @@ io.on('connection', (socket) => {
     // socket.emit('username', username);
   });
 
+  socket.on('_video', ({dataURL,targetUser}) => {
+    console.log("video from server worked");
+    const sender = activeUsers[socket.id];
+    const receiver = targetUser;
+    
+    // console.log(sender,receiver,dataURL);
+    const fileName = `video-${Date.now()}.mp4`;
+    const filePath = __dirname + '/public/videos/' + fileName;
+    const data = dataURL.replace(/^data:image\/png;base64,/, '');
+    const targetSocketId = Object.keys(activeUsers).find(
+      (socketId) => activeUsers[socketId] === targetUser
+    );
+  
+    fs.writeFile(filePath, data, 'base64', (err) => {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log('video saved:', fileName);
+        if (targetSocketId) {
+          console.log("id for video found");
+          socket.to(targetSocketId).emit('receive_video', '/videos/' + fileName);
+        }
+      }
+    });
+  });
+
 ///////////////////////////////////////////////////////////////////Image-Share///////////////////////////////////////////////////////////////////
 
 socket.on('send_image', ({dataURL,targetUser}) => {
@@ -187,30 +213,8 @@ socket.on('send_image', ({dataURL,targetUser}) => {
   });
 });
 
-
-socket.on('send_video', ({dataURL,targetUser}) => {
-  console.log("video from server worked");
-  const sender = activeUsers[socket.id];
-  const receiver = targetUser;
-  // console.log(sender,receiver,dataURL);
-  const fileName = `video-${Date.now()}.mp4`;
-  const filePath = __dirname + '/public/videos/' + fileName;
-  const data = dataURL.replace(/^data:image\/png;base64,/, '');
-  const targetSocketId = Object.keys(activeUsers).find(
-    (socketId) => activeUsers[socketId] === targetUser
-  );
-
-  fs.writeFile(filePath, data, 'base64', (err) => {
-    if (err) {
-      console.error(err);
-    } else {
-      console.log('video saved:', fileName);
-      if (targetSocketId) {
-        console.log("id for video found");
-        socket.to(targetSocketId).emit('receive_video', '/videos/' + fileName);
-      }
-    }
-  });
+socket.on('error', (error) => {
+  console.error('Socket error:', error);
 });
                                                                 //one-one communication//
   socket.on('send_message', async ({ targetUser, message }) => {
@@ -243,6 +247,7 @@ socket.on('send_video', ({dataURL,targetUser}) => {
       socket.to(targetSocketId).emit('user_typing', activeUsers[socket.id]);
     }
   });
+  
   socket.on('stopped_typing', (targetUser) => {
     const targetSocketId = Object.keys(activeUsers).find(
       (socketId) => activeUsers[socketId] === targetUser
@@ -369,9 +374,7 @@ socket.on('send_video', ({dataURL,targetUser}) => {
       res.status(500).json({ error: 'Error fetching group list' });
     }
   });
-
 });
-
 
 const PORT = 5000;
 server.listen(PORT, () => {

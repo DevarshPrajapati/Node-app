@@ -15,12 +15,11 @@ document.addEventListener('DOMContentLoaded', function () {
   //  const timepass=document.querySelector(".timepass")
   //  timepass.innerHTML="<%= username %>"
 
-  socket.on('connect', () => {
+  socket.on('connect',async () => {
     console.log('Connected to server');
-  });
-
-
-  socket.on('user_list', async (users) => {
+  // });
+  
+  // socket.on('user_list', async (users) => {
     // userList.innerHTML = users
     // .map((user) => {
     //   if (user === user_name) {
@@ -78,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </ul>
         <div class="typearea">  
           <input type="text" id="message-input" placeholder="Type a message">
-          <input type="file" id="img" style=" display:none" name="image">
+          <input type="file" id="img" style=" display:none" name="image" accept="video/*">
           <button onclick="document.getElementById('img').click()" id="camera_btn"><i class="fa fa-camera"></i></button>
           <button style=" display:none" id="send_button">Send</button> 
           <button onclick="document.getElementById('send_button').click()" id="s_btn"><i class="fa fa-paper-plane"></i></button>
@@ -125,7 +124,6 @@ document.addEventListener('DOMContentLoaded', function () {
         //Image Share
         var src
         const imgtag = document.getElementById("img")
-
         sendButton.addEventListener('click', () => {
           const message = messageInput.value;
           if (message.trim() !== '') {
@@ -148,18 +146,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 sended_img.style.width = '300px';
                 sended_img.style.height = '200px';
                 sended_img.src = dataURL;
+                sended_img.controls = true; 
                 sended_li.appendChild(sended_img);
                 socket.emit('send_image', ({dataURL,targetUser}))
-              } else if (dataURL.startsWith('data:video')) {
+              }  
+              else if (dataURL.startsWith('data:video')) {
                 var sended_video = document.createElement('video');
                 sended_video.style.width = '300px';
                 sended_video.style.height = '200px';
                 sended_video.src = dataURL;
-                console.log(dataURL);
                 sended_video.controls = true; 
                 sended_li.appendChild(sended_video);
                 console.log('Before emitting send_video event');
-                socket.emit('send_video', ({dataURL,targetUser}))
+                socket.emit('_video', ({targetUser,dataURL}))
               }
               messageList.appendChild(sended_li)
               chatBox.scrollTop = chatBox.scrollHeight;

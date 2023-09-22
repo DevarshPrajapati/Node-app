@@ -239,7 +239,10 @@ h2{
   padding: 8px;
   list-style-type: none;
     /* border-radius: 10px; */
+    word-break: break-all;
+    /* width: 20px; */
 }
+
 
 .yourchat{
   text-align: left;
@@ -249,6 +252,7 @@ h2{
   width: fit-content;
   border-radius: 10px;
   list-style-type: none;
+  word-break: break-all;
 }
 
 #group-name{
