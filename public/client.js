@@ -104,13 +104,14 @@ document.addEventListener('DOMContentLoaded', function () {
               if (message.sender === user_name) {
                 const messageClass = message.sender === user_name ? 'mychat' : 'yourchat';
                 messageItem.className = messageClass;
-                messageItem.innerHTML = `<b> ${message.message}: You </b> `;
+                messageItem.innerHTML = `<b>You :${message.message} </b> `;
               }
               else {
                 messageItem.className = "yourchat"
                 messageItem.textContent = `${message.sender}: ${message.message}`;
               }
               messageList.appendChild(messageItem);
+
             });
             chatBox.scrollTop = chatBox.scrollHeight;
           } else {
@@ -120,15 +121,13 @@ document.addEventListener('DOMContentLoaded', function () {
           console.error('Error fetching chat history:', error);
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //Image Share
-        var src
         const imgtag = document.getElementById("img")
         sendButton.addEventListener('click', () => {
           const message = messageInput.value;
           if (message.trim() !== '') {
             socket.emit('send_message', { targetUser, message });
-            messageList.innerHTML += `<li class="mychat"><b>${message}:You</b> </li>`;
+            messageList.innerHTML += `<li class="mychat"><b>You :${message}</b> </li>`;
             messageInput.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
           }
@@ -136,8 +135,8 @@ document.addEventListener('DOMContentLoaded', function () {
           const file = imgtag.files[0];
           if (file) {
             const reader = new FileReader();
-            var sended_li = document.createElement('li')
-            sended_li.classList.add("sended_li_img")
+            var sended_li = document.createElement('li');
+            sended_li.classList.add("sended_li_img");
             reader.onload = (event) => {
               const dataURL = event.target.result;
                console.log(dataURL);
@@ -146,16 +145,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 sended_img.style.width = '300px';
                 sended_img.style.height = '200px';
                 sended_img.src = dataURL;
-                sended_img.controls = true; 
+                sended_img.controls = true;
                 sended_li.appendChild(sended_img);
-                socket.emit('send_image', ({dataURL,targetUser}))
-              }  
+                socket.emit('send_image', ({dataURL,targetUser}));
+              }
               else if (dataURL.startsWith('data:video')) {
                 var sended_video = document.createElement('video');
                 sended_video.style.width = '300px';
                 sended_video.style.height = '200px';
                 sended_video.src = dataURL;
-                sended_video.controls = true; 
+                sended_video.controls = true;
                 sended_li.appendChild(sended_video);
                 console.log('Before emitting send_video event');
                 socket.emit('_video', ({targetUser,dataURL}))
@@ -188,20 +187,19 @@ document.addEventListener('DOMContentLoaded', function () {
           console.log(dataURL);
           var received_li = document.createElement('li')
           received_li.classList.add("received_li_img")
-            console.log("file type is video");      
+            console.log("file type is video");
             var received_video = document.createElement('video');
             received_video.style.width = '300px';
             received_video.style.height = '200px';
             received_video.src = dataURL;
-            received_video.controls = true; 
+            received_video.controls = true;
             received_li.appendChild(received_video);
-          messageList.appendChild(received_li)
+          messageList.appendChild(received_li);
           chatBox.scrollTop = chatBox.scrollHeight;
         });
         socket.on('receive_message', ({ sender, message }) => {
           if (sender === targetUser) {
             messageList.innerHTML += `<li class="yourchat"><strong>${sender}:</strong> ${message}</li>`;
-
             chatBox.scrollTop = chatBox.scrollHeight;
           }
         });

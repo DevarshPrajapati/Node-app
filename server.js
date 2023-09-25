@@ -157,6 +157,7 @@ io.on('connection', (socket) => {
     activeUsers[socket.id] = username;
     console.log(username, ": ", socket.id);
     // const user = req.session.user;
+    // console.log(activeUsers);
     socket.emit('user_list', Object.values(activeUsers));
     // socket.emit('username', username);
   });
@@ -169,11 +170,11 @@ io.on('connection', (socket) => {
     // console.log(sender,receiver,dataURL);
     const fileName = `video-${Date.now()}.mp4`;
     const filePath = __dirname + '/public/videos/' + fileName;
-    const data = dataURL.replace(/^data:image\/png;base64,/, '');
+    const data = dataURL.replace(/^data:video\/mp4;base64,/, '');
     const targetSocketId = Object.keys(activeUsers).find(
       (socketId) => activeUsers[socketId] === targetUser
     );
-  
+   
     fs.writeFile(filePath, data, 'base64', (err) => {
       if (err) {
         console.error(err);
@@ -187,7 +188,6 @@ io.on('connection', (socket) => {
     });
   });
 
-///////////////////////////////////////////////////////////////////Image-Share///////////////////////////////////////////////////////////////////
 
 socket.on('send_image', ({dataURL,targetUser}) => {
   console.log("image worked");
@@ -206,6 +206,7 @@ socket.on('send_image', ({dataURL,targetUser}) => {
     } else {
       console.log('Image saved:', fileName);
       if (targetSocketId) {
+        // console.log(targetSocketId);
         // socket.emit('image', '/images/' + fileName);
         socket.to(targetSocketId).emit('receive_image', '/images/' + fileName);
       }
@@ -213,11 +214,11 @@ socket.on('send_image', ({dataURL,targetUser}) => {
   });
 });
 
-socket.on('error', (error) => {
-  console.error('Socket error:', error);
-});
-                                                                //one-one communication//
-  socket.on('send_message', async ({ targetUser, message }) => {
+// socket.on('error', (error) => {
+//   console.error('Socket error:', error);
+// });
+
+socket.on('send_message', async ({ targetUser, message }) => {
     const sender = activeUsers[socket.id];
     const receiver = targetUser;
     // console.log(sender);
@@ -228,6 +229,7 @@ socket.on('error', (error) => {
     const targetSocketId = Object.keys(activeUsers).find(
       (socketId) => activeUsers[socketId] === targetUser
     );
+    console.log(targetSocketId);
     //     console.log(socket.id,"sender");
     // console.log(targetSocketId,"receiversid");
     if (targetSocketId) {
@@ -270,7 +272,7 @@ socket.on('error', (error) => {
         $or: [
           { sender: sender, receiver: receiver },
           { sender: receiver, receiver: sender },
-        ]
+        ],
       }).sort({ createdAt: 1 });
       // console.log(chat_history)
       res.json(chat_history);
@@ -280,7 +282,7 @@ socket.on('error', (error) => {
     }
   });
 
-                                                          //group communication//
+                                             //group communication//
   //create group
   socket.on('Create_room', async (roomname, admin) => {
     availableRooms[roomname] = [socket.id];
